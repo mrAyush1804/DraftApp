@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_draft_editor.xml
+    ─────────────────────────────────────────────────────────────────────────
+    Single-screen Draft Editor — operates in 3 modes driven by Activity code:
+
+      MODE            | Toolbar title   | Title field  | Desc field  | Buttons
+      ─────────────── | ─────────────── | ──────────── | ─────────── | ───────────────
+      CREATE          | New Draft       | Editable     | Editable    | Save  +  Lock
+      EDIT (Editable) | Edit Draft      | Read-only    | Editable    | Save  +  Lock
+      VIEW  (Locked)  | Locked Draft    | Read-only    | Read-only   | (locked banner)
+
+    Runtime toggles (set in Activity):
+      · etTitle.isEnabled / etTitle.isFocusable
+      · etDescription.isEnabled / etDescription.isFocusable
+      · btnSave.visibility / btnLock.visibility
+      · tvLockedBanner.visibility
+      · ivLockBadge tint + tvToolbarTitle text
+    ─────────────────────────────────────────────────────────────────────────
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAFA">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  TOP APP BAR                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:elevation="2dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="4dp"
+                android:paddingEnd="12dp">
+
+                <!-- Back arrow -->
+                <ImageView
+                    android:id="@+id/ivBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="8dp"
+                    android:src="@drawable/menuhome"
+                    android:contentDescription="Back"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:tint="#1565C0" />
+
+                <!-- Dynamic toolbar title -->
+                <TextView
+                    android:id="@+id/tvToolbarTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="New Draft"
+                    android:textColor="#1A1A2E"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    tools:text="Edit Draft" />
+
+                <!--
+                    Lock badge icon — shown in EDIT & VIEW modes.
+                    Tint:
+                      EDITABLE → #1565C0 (blue, open lock)
+                      LOCKED   → #FF6F00 (amber, closed lock)
+                    GONE in CREATE mode.
+                -->
+                <ImageView
+                    android:id="@+id/ivLockBadge"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:padding="6dp"
+                    android:src="@drawable/menuhome"
+                    android:contentDescription="Lock status"
+                    android:background="@drawable/bglockicon"
+                    android:visibility="gone"
+                    app:tint="#1565C0"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--  SCROLLABLE BODY                                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="120dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp">
+
+            <!-- ─────────────────────────────────────────────────────── -->
+            <!--  LOCKED BANNER  (VISIBLE only in VIEW / Locked mode)    -->
+            <!-- ─────────────────────────────────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/layoutLockedBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/bglockicon"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/menuhome"
+                    android:contentDescription="Locked"
+                    app:tint="#FF6F00" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:text="This draft is locked and cannot be edited."
+                    android:textColor="#E65100"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium" />
+
+            </LinearLayout>
+
+            <!-- ─────────────────────────────────────────────────────── -->
+            <!--  SECTION LABEL — Title                                  -->
+            <!-- ─────────────────────────────────────────────────────── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TITLE"
+                android:textColor="#9E9E9E"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="6dp" />
+
+            <!--
+                Title EditText
+                ──────────────
+                CREATE mode    → enabled=true,  focusable=true,  background=@drawable/bg_field_active
+                EDIT mode      → enabled=false, focusable=false, background=@drawable/bg_field_readonly
+                LOCKED mode    → enabled=false, focusable=false, background=@drawable/bg_field_readonly
+
+                Note: once a draft has been locked, title must NEVER become editable
+                again — enforce in Activity, not in XML.
+            -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="#E0E0E0"
+                app:boxStrokeWidth="1dp"
+                app:hintTextColor="#9E9E9E"
+                app:boxBackgroundColor="@color/white"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:hint="Enter draft title…"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:textColor="#1A1A2E"
+                    android:textSize="16sp"
+                    android:fontFamily="serif"
+                    android:textStyle="bold"
+                    android:imeOptions="actionNext"
+                    android:maxLines="3"
+                    tools:text="Quarterly Architectural Review" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- ─────────────────────────────────────────────────────── -->
+            <!--  SECTION LABEL — Description                            -->
+            <!-- ─────────────────────────────────────────────────────── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DESCRIPTION"
+                android:textColor="#9E9E9E"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.15"
+                android:layout_marginBottom="6dp" />
+
+            <!--
+                Description EditText
+                ─────────────────────
+                CREATE mode → enabled=true,  focusable=true
+                EDIT mode   → enabled=true,  focusable=true
+                LOCKED mode → enabled=false, focusable=false
+            -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="28dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="#E0E0E0"
+                app:boxStrokeWidth="1dp"
+                app:hintTextColor="#9E9E9E"
+                app:boxBackgroundColor="@color/white"
+                app:counterEnabled="true"
+                app:counterMaxLength="500"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:hint="Write your draft content here…"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:textColor="#1A1A2E"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
+                    android:lineSpacingExtra="4dp"
+                    android:gravity="top|start"
+                    android:minLines="8"
+                    android:maxLines="20"
+                    android:scrollbars="vertical"
+                    tools:text="Complete the 'Vertical Garden' schematic for the City Council meeting." />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- ─────────────────────────────────────────────────────── -->
+            <!--  STATUS CHIP ROW  (Editable / Locked badge)             -->
+            <!--  Visible in EDIT and VIEW modes                         -->
+            <!-- ─────────────────────────────────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/layoutStatusChip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="start|center_vertical"
+                android:layout_marginBottom="32dp"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+                <!-- Status chip background = @drawable/bg_chip_editable or bg_chip_locked -->
+                <LinearLayout
+                    android:id="@+id/chipStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:background="">
+
+                    <ImageView
+                        android:id="@+id/ivChipIcon"
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:src="@drawable/menuhome"
+                        android:contentDescription="Status icon"
+                        app:tint="#1565C0" />
+
+                    <TextView
+                        android:id="@+id/tvChipLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="EDITABLE"
+                        android:textColor="#1565C0"
+                        android:textSize="11sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:letterSpacing="0.10"
+                        tools:text="EDITABLE" />
+
+                </LinearLayout>
+
+                <!-- Last edited meta -->
+                <TextView
+                    android:id="@+id/tvLastEdited"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="LAST EDITED 2M AGO"
+                    android:textColor="#BDBDBD"
+                    android:textSize="10sp"
+                    android:fontFamily="sans-serif"
+                    android:letterSpacing="0.08"
+                    tools:text="LAST EDITED 2M AGO" />
+
+            </LinearLayout>
+
+            <!-- ─────────────────────────────────────────────────────── -->
+            <!--  ACTION BUTTONS                                          -->
+            <!--                                                          -->
+            <!--  CREATE mode → btnSave + btnLock both VISIBLE            -->
+            <!--  EDIT mode   → btnSave + btnLock both VISIBLE            -->
+            <!--  LOCKED mode → both GONE (banner shown instead)          -->
+            <!-- ─────────────────────────────────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/layoutActionButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="4dp">
+
+                <!--
+                    SAVE button
+                    CREATE → "Save Draft"
+                    EDIT   → "Update Draft"
+                    Saves / updates with state = Editable
+                -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Save Draft"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.04"
+                    app:backgroundTint="#1565C0"
+                    app:cornerRadius="12dp"
+                    app:elevation="0dp"
+                    app:icon="@drawable/menuhome"
+                    app:iconSize="18dp"
+                    app:iconTint="@color/white"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
+
+                <!--
+                    LOCK button
+                    Saves / updates with state = Locked
+                    Once locked, title becomes permanently read-only.
+                -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLock"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Lock Draft"
+                    android:textColor="#E65100"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.04"
+                    app:backgroundTint="#FFF3E0"
+                    app:cornerRadius="12dp"
+                    app:elevation="0dp"
+                    app:strokeColor="#FFB74D"
+                    app:strokeWidth="1dp"
+                    app:icon="@drawable/menuhome"
+                    app:iconSize="18dp"
+                    app:iconTint="#FF6F00"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
+
+            </LinearLayout>
+
+            <!-- ─────────────────────────────────────────────────────── -->
+            <!--  LOCKED FOOTER  (VISIBLE only in VIEW mode)             -->
+            <!--  Replaces the action buttons row                         -->
+            <!-- ─────────────────────────────────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/layoutLockedFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingVertical="20dp"
+                android:visibility="gone"
+                tools:visibility="gone">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/menuhome"
+                    android:contentDescription="Locked"
+                    app:tint="#CFD8DC" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="This draft has been finalized."
+                    android:textColor="#B0BEC5"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/tvFinalizedDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="FINALIZED AUG 12"
+                    android:textColor="#CFD8DC"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.10"
+                    tools:text="FINALIZED AUG 12" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

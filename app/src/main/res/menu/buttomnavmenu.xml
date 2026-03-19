@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    res/menu/bottom_nav_menu.xml
+    Bottom navigation items for the Drafts screen.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_drafts"
+        android:icon="@drawable/draft"
+        android:title="DRAFTS" />
+
+    <item
+        android:id="@+id/nav_create"
+        android:icon="@drawable/add"
+        android:title="CREATE" />
+
+    <item
+        android:id="@+id/nav_panel"
+        android:icon="@drawable/solar_panel"
+        android:title="PANEL" />
+
+    <item
+        android:id="@+id/nav_info"
+        android:icon="@drawable/setting__1_"
+        android:title="INFO" />
+
+</menu>

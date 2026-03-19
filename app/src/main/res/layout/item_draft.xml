@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_draft.xml
+    Reusable row for each draft entry in the Drafts list.
+
+    Bind via DraftAdapter in RecyclerView OR use <include> in activity_main.xml.
+
+    Fields to bind at runtime:
+      · tvItemTag      → "EDITABLE" | "LOCKED"
+      · tvItemTitle    → Draft name
+      · tvItemMeta     → "LAST EDITED 2M AGO" / "FINALIZED AUG 12"
+      · ivLockIcon     → toggle visibility / tint based on status
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="5dp"
+    android:paddingVertical="14dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!--
+        Left accent bar — color changes:
+          EDITABLE → #1565C0 (blue)
+          LOCKED   → #B0BEC5 (grey)
+    -->
+    <View
+        android:id="@+id/viewAccentBar"
+        android:layout_width="3dp"
+        android:layout_height="0dp"
+        android:background="#1565C0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Editable / Locked tag label -->
+    <TextView
+        android:id="@+id/tvItemTag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="EDITABLE"
+        android:textColor="#1565C0"
+        android:textSize="9sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.12"
+        tools:text="EDITABLE"
+        app:layout_constraintStart_toEndOf="@id/viewAccentBar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Draft title -->
+    <TextView
+        android:id="@+id/tvItemTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="8dp"
+        android:text="Quarterly Architectural Review"
+        android:textColor="#1A1A2E"
+        android:textSize="16sp"
+        android:fontFamily="serif"
+        android:textStyle="bold"
+        android:maxLines="2"
+        android:ellipsize="end"
+        tools:text="Quarterly Architectural Review"
+        app:layout_constraintStart_toEndOf="@id/viewAccentBar"
+        app:layout_constraintEnd_toStartOf="@id/ivLockIcon"
+        app:layout_constraintTop_toBottomOf="@id/tvItemTag" />
+
+    <!-- Meta — last edited or finalized date -->
+    <TextView
+        android:id="@+id/tvItemMeta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="3dp"
+        android:text="LAST EDITED 2M AGO"
+        android:textColor="#9E9E9E"
+        android:textSize="10sp"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="0.05"
+        tools:text="LAST EDITED 2M AGO"
+        app:layout_constraintStart_toEndOf="@id/viewAccentBar"
+        app:layout_constraintEnd_toStartOf="@id/ivLockIcon"
+        app:layout_constraintTop_toBottomOf="@id/tvItemTitle"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Lock icon (right side) -->
+    <ImageView
+        android:id="@+id/ivLockIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="0dp"
+        android:src="@drawable/lock"
+        android:padding="4dp"
+        android:background="@drawable/bglockicon"
+        app:tint="#90A4AE"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
