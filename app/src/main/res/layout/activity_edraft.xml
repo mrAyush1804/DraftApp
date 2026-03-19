@@ -293,7 +293,9 @@
                     android:gravity="center_vertical"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="6dp"
-                    android:background="">
+                    android:background="@drawable/bgchipeditable"
+                    android:visibility="gone"
+                    tools:visibility="gone">
 
                     <ImageView
                         android:id="@+id/ivChipIcon"
